@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Grid Viewer</title>
+  <!-- Bootstrap 5 CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .caption-input {
+      margin-top: 10px;
+    }
+
+    #image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+      padding: 10px;
+    }
+
+    .figure {
+      text-align: center;
+      margin: 0;
+      position: relative;
+    }
+
+    .figure-img {
+      width: 100%; /* Allow images to be full-width */
+      height: 400px; /* Keep height consistent */
+      object-fit: cover; /* Ensure the image covers the area without distortion */
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+    }
+
+    .figure-caption {
+      font-style: italic;
+      color: #555;
+      margin-top: 5px;
+    }
+
+    .form-container {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container input[type="file"] {
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Upload and Caption Images</h1>
+
+    <!-- Form for uploading image and captioning -->
+    <div class="form-container">
+      <div class="mb-3">
+        <label for="imageInput" class="form-label">Select Image</label>
+        <input type="file" class="form-control" id="imageInput" accept="image/*">
+      </div>
+
+      <div class="mb-3">
+        <label for="captionInput" class="form-label">Enter Caption</label>
+        <input type="text" class="form-control caption-input" id="captionInput" placeholder="Enter caption for the image" disabled>
+      </div>
+
+      <button class="btn btn-primary w-100" id="addImageBtn" disabled>Add Image</button>
+    </div>
+
+    <!-- Image Grid -->
+    <div id="image-grid" class="row"></div>
+  </div>
+
+  <!-- Bootstrap 5 JS (optional for interactive elements) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const imageGrid = document.getElementById('image-grid');
+      const imageInput = document.getElementById('imageInput');
+      const captionInput = document.getElementById('captionInput');
+      const addImageBtn = document.getElementById('addImageBtn');
+
+      // Variable to keep track of the image and its caption
+      let currentImage = null;
+
+      // Event listener for when the user selects an image
+      imageInput.addEventListener('change', function(event) {
+        const files = event.target.files;
+        
+        // Loop through selected files and create image elements
+        Array.from(files).forEach(file => {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            const imageData = e.target.result;
+
+            // Create the <figure> element with the image
+            currentImage = {
+              data: imageData,
+              caption: ''
+            };
+
+            // Enable the caption input and Add Image button
+            captionInput.disabled = false;
+            addImageBtn.disabled = false;
+
+            // Reset the caption input field
+            captionInput.value = '';
+          };
+
+          reader.readAsDataURL(file); // Convert image to base64
+        });
+      });
+
+      // Event listener for when the user enters a caption
+      captionInput.addEventListener('input', function() {
+        if (currentImage) {
+          currentImage.caption = captionInput.value.trim();
+        }
+      });
+
+      // Event listener for the Add Image button
+      addImageBtn.addEventListener('click', function() {
+        if (currentImage && currentImage.caption) {
+          // Create the figure and image elements
+          const figureElement = document.createElement('figure');
+          figureElement.classList.add('figure', 'col-12', 'col-md-4');
+
+          const imgElement = document.createElement('img');
+          imgElement.src = currentImage.data;
+          imgElement.alt = 'Uploaded Image';
+          imgElement.classList.add('figure-img', 'img-fluid', 'rounded');
+
+          const captionElement = document.createElement('figcaption');
+          captionElement.classList.add('figure-caption');
+          captionElement.textContent = currentImage.caption;
+
+          // Append image and caption to the figure element
+          figureElement.appendChild(imgElement);
+          figureElement.appendChild(captionElement);
+
+          // Append the figure to the grid
+          imageGrid.appendChild(figureElement);
+
+          // Reset form
+          imageInput.value = '';
+          captionInput.value = '';
+          captionInput.disabled = true;
+          addImageBtn.disabled = true;
+
+          // Clear currentImage data
+          currentImage = null;
+        }
+      });
+    });
+  </script>
+</body>
+</html>

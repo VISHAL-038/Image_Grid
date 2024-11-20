@@ -1,0 +1,16 @@
+{
+    "manifest_version": 3,
+    "name": "Image Grid Viewer",
+    "version": "1.0",
+    "description": "A Chrome extension that displays images in a grid layout.",
+    "action": {
+      "default_popup": "index.html"
+    },
+    "permissions": [
+      "activeTab"
+    ],
+    "icons": {
+      "48": "icon.png"
+    }
+  }
+  
